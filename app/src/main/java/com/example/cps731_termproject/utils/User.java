@@ -1,3 +1,5 @@
+package com.example.cps731_termproject.utils;
+
 public class User {
 
     private String email;

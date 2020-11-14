@@ -90,7 +90,7 @@ public class RegisterActivity extends AppCompatActivity {
                             documentReference.set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: User Profile is created for " + user.getUid());
+                                    Log.d(TAG, "onSuccess: com.example.cps731_termproject.utils.User Profile is created for " + user.getUid());
                                 }
                             }). addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -100,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
                             });
 
                             Log.d(TAG, "createUserWithEmail:success");
-                            Toast.makeText(RegisterActivity.this, "User Created.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "com.example.cps731_termproject.utils.User Created.", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(RegisterActivity.this, MainActivity.class));
 
                         }
