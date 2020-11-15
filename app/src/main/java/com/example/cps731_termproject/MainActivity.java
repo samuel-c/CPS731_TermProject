@@ -24,6 +24,7 @@ import android.widget.TimePicker;
 import com.example.cps731_termproject.utils.Alarm;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     // UI
     EditText editText;
     Button btnAdd, btnReset, btnAddAlarm;
+    FloatingActionButton fab;
     RecyclerView recyclerView;
     TimePicker timePicker;
 
@@ -122,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
             btnReset = findViewById(R.id.btn_reset);
             btnAddAlarm = findViewById(R.id.btn_add_alarm);
             editText = findViewById(R.id.edit_text);
+            fab = findViewById(R.id.fab);
 
 
             //timePicker = (TimePicker)findViewById(R.id.timePicker)
@@ -142,8 +145,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Test: " + sText);
                     if(!sText.equals("")){
                         //If not empty
-                        Alarm data = new Alarm();
-                        data.setAlarmName(sText);
+                        Date currentTime = Calendar.getInstance().getTime();
+                        Alarm data = new Alarm(sText, currentTime.getHours(), currentTime.getMinutes(),0);
+                        //data.setAlarmName(sText);
                         database.mainDao().insert(data);
                         Log.d(TAG, "Test: " + data.toString());
                         editText.setText("");
@@ -209,6 +213,14 @@ public class MainActivity extends AppCompatActivity {
                     //new TimePickerDialog(MainActivity.this, d, c.)
                 }
             });
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new TimePickerDialog(MainActivity.this, d, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false).show();
+                }
+            });
+
             /*
 
                 btnAdd.setOnClickListener(new View.OnClickListener() {
