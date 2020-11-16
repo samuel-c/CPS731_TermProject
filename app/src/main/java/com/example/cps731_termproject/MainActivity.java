@@ -138,6 +138,9 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(linearLayoutManager);
             adapter = new AlarmClockAdapter(MainActivity.this, dataList);
             recyclerView.setAdapter(adapter);
+
+
+
             btnAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             btnAddAlarm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new TimePickerDialog(MainActivity.this, d, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false).show();
+                    new TimePickerDialog(MainActivity.this, d, Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE), false).show();
                     //new TimePickerDialog(MainActivity.this, d, c.)
                 }
             });
@@ -217,68 +220,16 @@ public class MainActivity extends AppCompatActivity {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new TimePickerDialog(MainActivity.this, d, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false).show();
+                    new TimePickerDialog(MainActivity.this, d, Calendar.getInstance().get(Calendar.HOUR_OF_DAY), Calendar.getInstance().get(Calendar.MINUTE), false).show();
                 }
             });
 
-            /*
-
-                btnAdd.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String sText = editText.getText().toString().trim();
-                    Log.d(TAG, "Test: " + sText);
-                    if(!sText.equals("")){
-                        //If not empty
-                        Alarm data = new Alarm();
-                        data.setAlarmName(sText);
-                        database.mainDao().insert(data);
-                        Log.d(TAG, "Test: " + data.toString());
-                        editText.setText("");
-
-                        dataList.clear();
-                        dataList.addAll(database.mainDao().getAll());
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            });
-
-
-            RecyclerView recyclerView = findViewById(R.id.recyclerview);
-            final AlarmClockAdapter adapter = new AlarmClockAdapter(this);
-            recyclerView.setAdapter(adapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager((this)));
-
-            // Set up the AlarmViewModel.
-            mAlarmViewModel = new ViewModelProvider(this).get(AlarmViewModel.class);
-            // Get all the alarms from the database
-            // and associate them to the adapter.
-            mAlarmViewModel.getAllAlarms().observe(this, new Observer<List<Alarm>>() {
-                @Override
-                public void onChanged(@Nullable final List<Alarm> alarms) {
-                    // Update the cached copy of the alarms in the adapter.
-                    adapter.setAlarms(alarms);
-                }
-            });
-
-             */
         }
         else{
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
 
         }
 
-
-        //String name = db.
-
-//        String name = user.getDisplayName();
-//        String email = user.getEmail();
-
-
-//        mName.setText(name);
-//
-
-//        mEmail.setText(email);
     }
 
 

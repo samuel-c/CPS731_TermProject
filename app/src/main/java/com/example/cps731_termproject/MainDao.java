@@ -36,6 +36,10 @@ public interface MainDao {
     @Query("UPDATE alarm_table SET alarmName = :sText WHERE ID = :sID")
     void update(int sID, String sText);
 
+    //Update
+    @Query("UPDATE alarm_table SET state = :sState WHERE ID = :sID")
+    void updateState(int sID, int sState);
+
     //Update Time
     @Query("UPDATE alarm_table SET hourOfDay = :sHourOfDay, minutes = :sMinutes WHERE ID = :sID")
     void updateTime(int sID, int sHourOfDay, int sMinutes);

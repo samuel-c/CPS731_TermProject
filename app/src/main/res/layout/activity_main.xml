@@ -1,102 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="15dp"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/buttonSignOut"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sign Out"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.514"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDisplayEmail" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/edit_text"
-        android:hint="Enter text"
-        android:padding="12dp"
-        android:background="@android:drawable/editbox_background"/>
+        <Button
+            android:id="@+id/buttonSignOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Out"
+            android:layout_alignParentLeft="true" />
 
     <LinearLayout
+        android:id="@+id/user_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:orientation="vertical"
+        android:layout_toRightOf="@id/buttonSignOut">
 
-        <Button
+        <TextView
+            android:id="@+id/textViewDisplayName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_add"
-            android:text="Add"/>
+            android:layout_toRightOf="@id/buttonSignOut"
+            android:text="Placeholder Name" />
 
-        <Button
+        <TextView
+            android:id="@+id/textViewDisplayEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_reset"
-            android:text="Reset"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btn_add_alarm"
-            android:text="Add Alarm"/>
-
+            android:layout_below="@id/textViewDisplayName"
+            android:layout_toRightOf="@id/buttonSignOut"
+            android:text="Placeholder Email" />
     </LinearLayout>
+        <EditText
+            android:id="@+id/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/editbox_background"
+            android:hint="Enter text"
+            android:padding="12dp"
+            android:layout_below="@id/buttonSignOut"
+            android:layout_alignParentLeft="true"/>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_below="@id/edit_text"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/buttonGroup"
+            >
+            <Button
+                android:id="@+id/btn_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add" />
+
+            <Button
+                android:id="@+id/btn_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset" />
+
+            <Button
+                android:id="@+id/btn_add_alarm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Alarm" />
+        </LinearLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="342dp"
+        android:layout_height="744dp"
         android:layout_marginTop="8dp"
-        tools:listitem="@layout/recyclerview_item" />
+        tools:listitem="@layout/recyclerview_item"
+        android:layout_below="@id/buttonGroup"
+        android:layout_alignParentLeft="true"/>
+
+    <LinearLayout
+        android:id="@+id/adLayoutId"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:layout_alignParentBottom="true"
+        android:background="#00000000"
+        android:orientation="horizontal" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="385dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:baselineAlignBottom="false"
-        android:clickable="true"
-        app:srcCompat="@android:drawable/ic_input_add" />
-
-    <TextView
-        android:id="@+id/textViewDisplayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="136dp"
-        android:text="Placeholder Name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textViewDisplayEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Placeholder Email"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDisplayName" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonSignOut" />
-
-</LinearLayout>
+        android:layout_above="@id/adLayoutId"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_alarm"
+        android:contentDescription="@string/add_alarm"
+        />
+</RelativeLayout>
