@@ -96,11 +96,12 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         //Set text on text view
         holder.textView.setText(alarm.getAlarmName());
         holder.textTime.setText(alarm.toString());
-        if (count != count2) {
+
+        //if (count != count2) {
             count2++;
             holder.btnSwitch.setChecked(alarm.getState() == 0 ? true : false);
             Log.d(TAG, "test: " + position );
-        }
+        //}
 
         Calendar c = Calendar.getInstance();
 
@@ -131,20 +132,42 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         };
 
         // Alarm state (switch button)
+        holder.btnSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (alarm.getState() != 1){
+                    alarm.setState(1);
+                }
+                else{
+                    alarm.setState(0);
+                }
+
+                database.mainDao().updateState(sID, alarm.getState());
+
+                //dataList.set(position, alarm);
+                Log.d(TAG, "Switch is: " + (alarm.getState() != 1 ? "on" : "off"));
+
+                dataList.clear();
+                dataList.addAll(database.mainDao().getAll());
+                notifyDataSetChanged();
+            }
+        });
+
+        /*
         holder.btnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked) {
-                    Calendar c = Calendar.getInstance();
-                    c.set(Calendar.HOUR_OF_DAY, alarm.getHours());
-                    c.set(Calendar.MINUTE, alarm.getMinutes());
+                    //Calendar c = Calendar.getInstance();
+                    //c.set(Calendar.HOUR_OF_DAY, alarm.getHours());
+                    //c.set(Calendar.MINUTE, alarm.getMinutes());
 
-                    alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+                   // alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
 
-                    Intent myIntent = new Intent(context, AlarmReceiver.class);
-                    alarmIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
-                    alarmManager.set(AlarmManager.RTC, c.getTimeInMillis(), alarmIntent);
+                    //Intent myIntent = new Intent(context, AlarmReceiver.class);
+                    //alarmIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
+                    //alarmManager.set(AlarmManager.RTC, c.getTimeInMillis(), alarmIntent);
 
                     alarm.setState(0); // STANDBY
                 }
@@ -152,7 +175,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                     alarm.setState(1); // STOPPED
                 }
                 //Update DB
-                holder.btnSwitch.setClickable(false);
+                //holder.btnSwitch.setClickable(false);
 
                 database.mainDao().updateState(sID, alarm.getState());
 
@@ -162,14 +185,14 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                 dataList.clear();
                 dataList.addAll(database.mainDao().getAll());
                 notifyDataSetChanged();
-                holder.btnSwitch.setClickable(true);
+                //holder.btnSwitch.setClickable(true);
 
                 Log.d(TAG, "Switch is: " + (isChecked ? "on" : "off"));
                 //notifyItemChanged(position);
 
             }
         });
-
+*/
         // Alarm update (time)
         holder.textTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,20 +234,23 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                 btnUpdate.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
+                        Log.d(TAG, "position is: " + (position));
+                        Log.d(TAG, "state is: " + (a.getState()));
+
                         dialog.dismiss();
                         //Get Updated Text
                         String uAlarmName = editText.getText().toString().trim();
 
-                        holder.btnSwitch.setClickable(false);
+                        //holder.btnSwitch.setClickable(false);
                         //Update DB
                         database.mainDao().update(sID, uAlarmName);
                         alarm.setAlarmName(uAlarmName);
-                        dataList.set(position, alarm);
+                        dataList.set(position, a);
 
                         //dataList.clear();
                         //dataList.addAll(database.mainDao().getAll());
                         notifyItemChanged(position);
-                        holder.btnSwitch.setClickable(true);
+                        //holder.btnSwitch.setClickable(true);
                     }
                 });
             }

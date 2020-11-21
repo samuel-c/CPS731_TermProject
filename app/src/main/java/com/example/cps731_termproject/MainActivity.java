@@ -120,9 +120,9 @@ public class MainActivity extends AppCompatActivity {
 
             // UI
             recyclerView = findViewById(R.id.recycler_view);
-            btnAdd = findViewById(R.id.btn_add);
+            //btnAdd = findViewById(R.id.btn_add);
             btnReset = findViewById(R.id.btn_reset);
-            btnAddAlarm = findViewById(R.id.btn_add_alarm);
+            //btnAddAlarm = findViewById(R.id.btn_add_alarm);
             editText = findViewById(R.id.edit_text);
             fab = findViewById(R.id.fab);
 
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setAdapter(adapter);
 
 
-
+/*
             btnAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             });
-
+*/
             btnReset.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             };
-
+/*
             btnAddAlarm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     //new TimePickerDialog(MainActivity.this, d, c.)
                 }
             });
-
+*/
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
