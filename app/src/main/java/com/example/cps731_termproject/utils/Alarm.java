@@ -54,7 +54,7 @@ public class Alarm implements Serializable {
         this.hourOfDay = 10;
         this.minutes = 10;
         this.seconds = 10;
-        daysOfWeek = new boolean[] {false, false, false, false, false, false, false};
+        daysOfWeek = new boolean[] {false, false, false, false, false, false, false}; //Sun to Sat
         state = STANDBY;
         vibration = false;
     }

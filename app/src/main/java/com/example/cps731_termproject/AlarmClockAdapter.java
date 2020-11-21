@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -42,6 +43,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cps731_termproject.utils.Alarm;
+import com.example.cps731_termproject.utils.Converters;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -214,6 +216,9 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
 
                 Alarm tAlarm = database.mainDao().getAlarm(sID);
                 String sText = tAlarm.getAlarmName();
+                boolean tVib = tAlarm.isVibration();
+                boolean[] tDaysOfWeek = tAlarm.getDaysOfWeek();
+
                 //Dialog
                 Dialog dialog = new Dialog(context);
                 //dialog.setContentView(R.layout.content_main);
@@ -228,9 +233,26 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
 
                 //Init and assign variables
                 EditText editText = dialog.findViewById(R.id.edit_text);
+                CheckBox vib = dialog.findViewById(R.id.checkBoxVibration);
+                CheckBox sun = dialog.findViewById(R.id.checkBoxSun);
+                CheckBox mon = dialog.findViewById(R.id.checkBoxMon);
+                CheckBox tue = dialog.findViewById(R.id.checkBoxTue);
+                CheckBox wed = dialog.findViewById(R.id.checkBoxWed);
+                CheckBox thu = dialog.findViewById(R.id.checkBoxThu);
+                CheckBox fri = dialog.findViewById(R.id.checkBoxFri);
+                CheckBox sat = dialog.findViewById(R.id.checkBoxSat);
                 Button btnUpdate = dialog.findViewById(R.id.btn_update);
 
                 editText.setText(sText);
+                vib.setChecked(tVib);
+                sun.setChecked(tDaysOfWeek[0]);
+                mon.setChecked(tDaysOfWeek[1]);
+                tue.setChecked(tDaysOfWeek[2]);
+                wed.setChecked(tDaysOfWeek[3]);
+                thu.setChecked(tDaysOfWeek[4]);
+                fri.setChecked(tDaysOfWeek[5]);
+                sat.setChecked(tDaysOfWeek[6]);
+
                 btnUpdate.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v){
@@ -241,15 +263,36 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                         //Get Updated Text
                         String uAlarmName = editText.getText().toString().trim();
 
+                        boolean[] temp = new boolean[] {false, false, false, false, false, false, false};
+                        temp[0] = sun.isChecked();
+                        temp[1] = mon.isChecked();
+                        temp[2] = tue.isChecked();
+                        temp[3] = wed.isChecked();
+                        temp[4] = thu.isChecked();
+                        temp[5] = fri.isChecked();
+                        temp[6] = sat.isChecked();
+                        Log.d(TAG, "Array[0]: " + (temp[0]));
+                        Log.d(TAG, "Array[1]: " + (temp[1]));
+                        Log.d(TAG, "Array[2]: " + (temp[2]));
+                        Log.d(TAG, "Array[3]: " + (temp[3]));
+                        Log.d(TAG, "Array[4]: " + (temp[4]));
+                        Log.d(TAG, "Array[5]: " + (temp[5]));
+                        Log.d(TAG, "Array[6]: " + (temp[6]));
+                        //Converters.arrayToString(temp)
                         //holder.btnSwitch.setClickable(false);
                         //Update DB
                         database.mainDao().update(sID, uAlarmName);
+                        database.mainDao().updateVib(sID, vib.isChecked());
+                        database.mainDao().updateDOW(sID, Converters.arrayToString(temp));
                         alarm.setAlarmName(uAlarmName);
+                        alarm.setVibration(vib.isChecked());
+                        alarm.setDaysOfWeek(temp);
                         dataList.set(position, a);
 
-                        //dataList.clear();
-                        //dataList.addAll(database.mainDao().getAll());
-                        notifyItemChanged(position);
+                        dataList.clear();
+                        dataList.addAll(database.mainDao().getAll());
+                        notifyDataSetChanged();
+                        //notifyItemChanged(position);
                         //holder.btnSwitch.setClickable(true);
                     }
                 });

@@ -8,7 +8,7 @@ public class Converters {
         String [] test = value.split(",");
         boolean [] temp = new boolean[7];
         for (int i = 0 ; i < test.length; i ++){
-            if(test[i] == "true")
+            if(test[i].equals("true"))
                 temp[i] = true;
             else
                 temp[i] = false;

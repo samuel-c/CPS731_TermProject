@@ -44,6 +44,14 @@ public interface MainDao {
     @Query("UPDATE alarm_table SET hourOfDay = :sHourOfDay, minutes = :sMinutes WHERE ID = :sID")
     void updateTime(int sID, int sHourOfDay, int sMinutes);
 
+    //Update
+    @Query("UPDATE alarm_table SET vibration = :sVibration WHERE ID = :sID")
+    void updateVib(int sID, boolean sVibration);
+
+    //Update
+    @Query("UPDATE alarm_table SET daysOfWeek = :sDaysOfWeek WHERE ID = :sID")
+    void updateDOW(int sID, String sDaysOfWeek);
+
     //Get all data
     @Query("SELECT * FROM alarm_table")
     List<Alarm> getAll();
