@@ -6,18 +6,50 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.cps731_termproject.utils.Alarm;
+import com.example.cps731_termproject.utils.WakeLocker;
 //import android.support.v4.app.NotificationCompat;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
     private static final int NOTIFICATION_ID = 0;
+    private final String TAG = "AlarmReceiver";
 
-
-    public AlarmReceiver() {
-    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Toast.makeText(context, "ALARM GOING OFF", Toast.LENGTH_LONG).show();
+        Log.d(TAG, "ALARM GOING OFF!!!!!!!!");
+        WakeLocker.acquire(context);
+        try{
+            Bundle bundle = intent.getExtras();
+            Alarm alarm = (Alarm) bundle.getSerializable("alarm");
+
+            Intent newIntent = new Intent(context, AlarmActivity.class);
+            newIntent.putExtra("alarm", alarm);
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(newIntent);
+        }
+        catch(Exception e){
+            Toast.makeText(context, "There was an error, but we got the alarm", Toast.LENGTH_LONG).show();
+            Log.e("AlarmReceiver", Log.getStackTraceString(e));
+        }
+
+        Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if (alarmUri == null) {
+            alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        }
+        Ringtone ringtone = RingtoneManager.getRingtone(context, alarmUri);
+        ringtone.play();
+
+        /*
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -45,10 +77,11 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL);
 
-         */
+
 
         //Deliver the notification
         notificationManager.notify(NOTIFICATION_ID, notification);
+        */
     }
 
 }

@@ -48,19 +48,6 @@ public class Alarm implements Serializable {
     //@ColumnInfo(name = "music")
     //MediaPlayer alarmMusic;
 
-    public Alarm(){
-        this.id = id;
-        this.alarmName = alarmName;
-        this.hourOfDay = 10;
-        this.minutes = 10;
-        this.seconds = 10;
-        daysOfWeek = new boolean[] {false, false, false, false, false, false, false}; //Sun to Sat
-        state = STANDBY;
-        vibration = false;
-    }
-
-
-    @Ignore
     public Alarm(String alarmName, int hours, int minutes, int seconds){
         this.alarmName = alarmName;
         this.hourOfDay = hours;
@@ -70,6 +57,17 @@ public class Alarm implements Serializable {
         state = STANDBY;
         vibration = false;
         //this.alarmMusic = alarmMusic;
+    }
+
+    public Alarm(){
+        this.id = id;
+        this.alarmName = alarmName;
+        this.hourOfDay = 10;
+        this.minutes = 10;
+        this.seconds = 10;
+        daysOfWeek = new boolean[] {false, false, false, false, false, false, false}; //Sun to Sat
+        state = STANDBY;
+        vibration = false;
     }
 
     /*

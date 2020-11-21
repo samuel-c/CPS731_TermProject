@@ -10,7 +10,10 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -65,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayoutManager linearLayoutManager;
     RoomDB database;
     AlarmClockAdapter adapter;
-
+    AlarmManager alarmManager;
 
 
     @Override
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         MediaPlayer alarmMusic = new MediaPlayer();
         alarmMusic = alarmMusic.create(getApplicationContext(), R.raw.alarm_sound);
 
@@ -191,6 +195,27 @@ public class MainActivity extends AppCompatActivity {
                     //c.set((Calendar.HOUR_OF_DAY), hourOfDay);
                     //c.set((Calendar.MINUTE), minute);
 
+                    //alarm = database.mainDao().getAlarmByName("Alarm #" + (dataList.size() + 1));
+
+
+                    // Initialize current Alarm
+                    Calendar currentAlarmTime = Calendar.getInstance();
+                    currentAlarmTime.set(Calendar.HOUR_OF_DAY, alarm.getHours());
+                    currentAlarmTime.set(Calendar.MINUTE, alarm.getMinutes());
+                    currentAlarmTime.set(Calendar.SECOND, 0);
+
+                    if (currentAlarmTime.before(Calendar.getInstance()))
+                        currentAlarmTime.add(Calendar.DAY_OF_MONTH, 1); // Go next day
+
+                    Log.d(TAG, "Cal: " + currentAlarmTime.getTime().toString());
+
+                    Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                    intent.putExtra("alarm", alarm);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    Log.d(TAG, "Alarm Started: " + alarm.getAlarmName() + alarm.getId() + getApplicationContext().toString());
+
+
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentAlarmTime.getTimeInMillis(), pendingIntent);
 
 
                     if (c.get(Calendar.AM_PM) == 0){

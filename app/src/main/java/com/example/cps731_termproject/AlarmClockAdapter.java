@@ -23,6 +23,7 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.provider.AlarmClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +49,7 @@ import com.example.cps731_termproject.utils.Converters;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Handler;
 
 /**
  * Adapter for the RecyclerView that displays a list of words.
@@ -98,12 +100,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         //Set text on text view
         holder.textView.setText(alarm.getAlarmName());
         holder.textTime.setText(alarm.toString());
-
-        //if (count != count2) {
-            count2++;
-            holder.btnSwitch.setChecked(alarm.getState() == 0 ? true : false);
-            Log.d(TAG, "test: " + position );
-        //}
+        holder.btnSwitch.setChecked(alarm.getState() == 0 ? true : false);
 
         Calendar c = Calendar.getInstance();
 
@@ -137,18 +134,43 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         holder.btnSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Initialize current Alarm
+                Calendar currentAlarmTime = Calendar.getInstance();
+                currentAlarmTime.set(Calendar.HOUR_OF_DAY, alarm.getHours());
+                currentAlarmTime.set(Calendar.MINUTE, alarm.getMinutes());
+                currentAlarmTime.set(Calendar.SECOND, 0);
+
+                if (currentAlarmTime.before(Calendar.getInstance()))
+                    currentAlarmTime.add(Calendar.DAY_OF_MONTH, 1); // Go next day
+
+                Log.d(TAG, "Cal: " + currentAlarmTime.getTime().toString());
+
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                intent.putExtra("alarm", alarm);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, sID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                Log.d(TAG, "Alarm Started: " + alarm.getAlarmName() + sID);
+
+
+                Log.d(TAG, "SWITCH CLICKED");
                 if (alarm.getState() != 1){
-                    alarm.setState(1);
+                    alarm.setState(1); // Set to OFF
+                    alarmManager.cancel(pendingIntent);
+                    Log.d(TAG, "Alarm Canceled: " + alarm.getAlarmName()+ context.toString());
+
                 }
                 else{
-                    alarm.setState(0);
+                    alarm.setState(0); // Set to Standby
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentAlarmTime.getTimeInMillis(), pendingIntent);
+                    Log.d(TAG, "Alarm Started: " + alarm.getAlarmName()+ context.toString());
+
                 }
 
+                // Update current alarm state
                 database.mainDao().updateState(sID, alarm.getState());
 
-                //dataList.set(position, alarm);
                 Log.d(TAG, "Switch is: " + (alarm.getState() != 1 ? "on" : "off"));
 
+                // Update dataset
                 dataList.clear();
                 dataList.addAll(database.mainDao().getAll());
                 notifyDataSetChanged();
@@ -331,8 +353,6 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            Log.d(TAG, "COUNT: " + getItemCount());
 
             // Assign variables
             btnSwitch = itemView.findViewById(R.id.alarm_switch1);
