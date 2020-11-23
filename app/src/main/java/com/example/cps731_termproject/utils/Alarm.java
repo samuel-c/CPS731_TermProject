@@ -1,6 +1,9 @@
 package com.example.cps731_termproject.utils;
 
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -20,6 +23,7 @@ public class Alarm implements Serializable {
     public int STANDBY = 0;
     public int STOPPED = 1;
     public int RINGING = 2;
+    public Ringtone ringtone;
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -48,7 +52,7 @@ public class Alarm implements Serializable {
     //@ColumnInfo(name = "music")
     //MediaPlayer alarmMusic;
 
-    public Alarm(String alarmName, int hours, int minutes, int seconds){
+    public Alarm(String alarmName, int hours, int minutes, int seconds, Ringtone ringtone){
         this.alarmName = alarmName;
         this.hourOfDay = hours;
         this.minutes = minutes;
@@ -56,6 +60,7 @@ public class Alarm implements Serializable {
         daysOfWeek = new boolean[] {false, false, false, false, false, false, false};
         state = STANDBY;
         vibration = false;
+        this.ringtone = ringtone;
         //this.alarmMusic = alarmMusic;
     }
 
@@ -68,6 +73,8 @@ public class Alarm implements Serializable {
         daysOfWeek = new boolean[] {false, false, false, false, false, false, false}; //Sun to Sat
         state = STANDBY;
         vibration = false;
+        ringtone = null;
+
     }
 
     /*
@@ -77,15 +84,17 @@ public class Alarm implements Serializable {
 
 
     @Ignore
-    public Alarm(int id, String alarmName, int hour, int min, int sec){
+    public Alarm(int id, String alarmName, int hour, int min, int sec, Ringtone ringtone){
         this.id = id;
         this.alarmName = alarmName;
         this.hourOfDay = hour;
         this.minutes = min;
         this.seconds = sec;
+        this.ringtone = ringtone;
         daysOfWeek = new boolean[] {false, false, false, false, false, false, false};
         state = STANDBY;
         vibration = false;
+
         //this.alarmMusic = alarmMusic;
     }
 

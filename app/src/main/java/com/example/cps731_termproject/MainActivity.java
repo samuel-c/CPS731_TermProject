@@ -16,6 +16,9 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     RoomDB database;
     AlarmClockAdapter adapter;
     AlarmManager alarmManager;
+
 
 
     @Override
@@ -178,7 +182,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-
+            // Alarm ringtone
+            Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            if (alarmUri == null) {
+                alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            }
+            Ringtone ringtone = RingtoneManager.getRingtone(this, alarmUri);
 
             Calendar c = Calendar.getInstance();
             TimePickerDialog.OnTimeSetListener d = new TimePickerDialog.OnTimeSetListener() {
@@ -186,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     Date currentTime = Calendar.getInstance().getTime();
 
-                    Alarm alarm = new Alarm("Alarm #" + (dataList.size() + 1), hourOfDay, minute, 0);
+                    Alarm alarm = new Alarm("Alarm #" + (dataList.size() + 1), hourOfDay, minute, 0, ringtone);
                     database.mainDao().insert(alarm);
 
                     dataList.clear();
