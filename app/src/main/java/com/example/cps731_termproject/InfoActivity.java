@@ -253,8 +253,16 @@ public class InfoActivity extends AppCompatActivity {
                         getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + locationTxt + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
 
                         try{
+                            String country = "";
                             int findComma = locationTxt.lastIndexOf(",");
-                            String country = findComma != -1 ? locationTxt.substring(findComma + 1).trim() : "";
+                            if (findComma != -1) {
+                                country = locationTxt.substring(findComma + 1).trim();
+                            }
+                            else{
+                                //Toast.makeText(InfoActivity.this, "Invalid Location", Toast.LENGTH_LONG).show();
+                                country = "";
+                            }
+                            //String country = findComma != -1 ? locationTxt.substring(findComma + 1).trim() : "";
                             Log.i ("test", country);
                             getNews(country);
                         }
@@ -304,9 +312,9 @@ public class InfoActivity extends AppCompatActivity {
         try {
             String content2;
             Log.i("asd :"  ,"dsakd;lasd");
-            content2 = news.execute("http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=d10ca8f5633d47209bd5a4736d102516").get();
+            content2 = news.execute("http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=5233fac1e7824b48aaa0c6c4da530648").get();
             Log.i("asd :"  ,content2);
-            Log.i("test :"  ,"http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=d10ca8f5633d47209bd5a4736d102516");
+            Log.i("test :"  ,"http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=5233fac1e7824b48aaa0c6c4da530648");
             JSONObject jsonObject = new JSONObject(content2);
             String newsData = jsonObject.getString("articles");
 
@@ -324,8 +332,18 @@ public class InfoActivity extends AppCompatActivity {
             String totalResults = jsonObject.getString("totalResults");
             Log.i("totalResults"  ,totalResults);
 
-            if (!totalResults.equals("0"))
+            if (!totalResults.equals("0")) {
+                Toast.makeText(InfoActivity.this, "Location Updated.", Toast.LENGTH_LONG).show();
+                //Log.i("WWW"  ,totalResults);
+
                 dataList.clear();
+            }
+            else{
+                Toast.makeText(InfoActivity.this, "Invalid Input.", Toast.LENGTH_LONG).show();
+                //Log.i("WWW@"  ,totalResults);
+
+            }
+
             for(int i = 0;i<array.length();i++)
             {
                 JSONObject inArticle = array.getJSONObject(i);
