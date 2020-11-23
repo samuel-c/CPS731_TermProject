@@ -56,8 +56,8 @@ public interface MainDao {
     @Query("SELECT * FROM alarm_table")
     List<Alarm> getAll();
 
-    @Query("SELECT * FROM alarm_table WHERE alarmName = :sName")
-    Alarm getAlarmByName(String sName);
+    @Query("SELECT * FROM alarm_table WHERE alarmName = :sName AND hourOfDay = :sHour AND minutes = :sMinutes")
+    Alarm getAlarmByName(String sName, int sHour, int sMinutes);
 
     @Query("SELECT * FROM alarm_table WHERE ID = :sID")
     Alarm getAlarm(int sID);

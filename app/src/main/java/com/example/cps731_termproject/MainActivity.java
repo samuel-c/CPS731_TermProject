@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         MediaPlayer alarmMusic = new MediaPlayer();
         alarmMusic = alarmMusic.create(getApplicationContext(), R.raw.alarm_sound);
 
-        // Authenticate com.example.cps731_termproject.utils.User
+        // Authenticate
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
@@ -195,8 +195,7 @@ public class MainActivity extends AppCompatActivity {
                     //c.set((Calendar.HOUR_OF_DAY), hourOfDay);
                     //c.set((Calendar.MINUTE), minute);
 
-                    //alarm = database.mainDao().getAlarmByName("Alarm #" + (dataList.size() + 1));
-
+                    alarm = database.mainDao().getAlarmByName(alarm.getAlarmName(), alarm.getHours(), alarm.getMinutes());
 
                     // Initialize current Alarm
                     Calendar currentAlarmTime = Calendar.getInstance();
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
                     intent.putExtra("alarm", alarm);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    Log.d(TAG, "Alarm Started: " + alarm.getAlarmName() + alarm.getId() + getApplicationContext().toString());
+                    Log.d(TAG, "Alarm Started: Name: " + alarm.getAlarmName() + ", ID: " + alarm.getId());
 
 
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentAlarmTime.getTimeInMillis(), pendingIntent);

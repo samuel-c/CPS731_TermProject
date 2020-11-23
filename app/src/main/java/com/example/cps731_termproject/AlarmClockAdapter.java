@@ -155,13 +155,13 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                 if (alarm.getState() != 1){
                     alarm.setState(1); // Set to OFF
                     alarmManager.cancel(pendingIntent);
-                    Log.d(TAG, "Alarm Canceled: " + alarm.getAlarmName()+ context.toString());
+                    Log.d(TAG, "Alarm Canceled: Name: " + alarm.getAlarmName() + ", ID: " + alarm.getId());
 
                 }
                 else{
                     alarm.setState(0); // Set to Standby
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentAlarmTime.getTimeInMillis(), pendingIntent);
-                    Log.d(TAG, "Alarm Started: " + alarm.getAlarmName()+ context.toString());
+                    Log.d(TAG, "Alarm Started: Name: " + alarm.getAlarmName() + ", ID: " + alarm.getId());
 
                 }
 
@@ -177,46 +177,6 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
             }
         });
 
-        /*
-        holder.btnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                if (isChecked) {
-                    //Calendar c = Calendar.getInstance();
-                    //c.set(Calendar.HOUR_OF_DAY, alarm.getHours());
-                    //c.set(Calendar.MINUTE, alarm.getMinutes());
-
-                   // alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
-
-                    //Intent myIntent = new Intent(context, AlarmReceiver.class);
-                    //alarmIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
-                    //alarmManager.set(AlarmManager.RTC, c.getTimeInMillis(), alarmIntent);
-
-                    alarm.setState(0); // STANDBY
-                }
-                else {
-                    alarm.setState(1); // STOPPED
-                }
-                //Update DB
-                //holder.btnSwitch.setClickable(false);
-
-                database.mainDao().updateState(sID, alarm.getState());
-
-                //dataList.set(position, alarm);
-
-
-                dataList.clear();
-                dataList.addAll(database.mainDao().getAll());
-                notifyDataSetChanged();
-                //holder.btnSwitch.setClickable(true);
-
-                Log.d(TAG, "Switch is: " + (isChecked ? "on" : "off"));
-                //notifyItemChanged(position);
-
-            }
-        });
-*/
         // Alarm update (time)
         holder.textTime.setOnClickListener(new View.OnClickListener() {
             @Override
