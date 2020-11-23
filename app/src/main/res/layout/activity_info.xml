@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".InfoActivity">
+
+    <TextView
+        android:id="@+id/textCurrentTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="qwe"
+        android:textAlignment="center"
+        android:textColor="#FF5722"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/textCityCountry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Toronto, US"
+        android:textAlignment="center"
+        android:textColor="#2E2A2A"
+        android:textSize="30sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/weatherIcon"
+            android:layout_width="81dp"
+            android:layout_height="match_parent"
+            android:baselineAlignBottom="false"
+            android:contentDescription="@string/todo"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="asd"
+            android:textColor="#2E2A2A"
+            android:textSize="48sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textDescription"
+        android:layout_width="match_parent"
+        android:layout_height="31dp"
+        android:text="Feels like -5°C. Light rain. Gentle Breeze"
+        android:textAlignment="center"
+        android:textColor="#1B1919"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/btnWeatherURL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="More information" />
+
+</LinearLayout>

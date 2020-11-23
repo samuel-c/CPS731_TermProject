@@ -23,6 +23,7 @@ public class Alarm implements Serializable {
     public int STANDBY = 0;
     public int STOPPED = 1;
     public int RINGING = 2;
+    @Ignore
     public Ringtone ringtone;
 
     @PrimaryKey(autoGenerate = true)
