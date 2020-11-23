@@ -2,17 +2,22 @@ package com.example.cps731_termproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -49,6 +54,9 @@ public class InfoActivity extends AppCompatActivity {
     LocationManager locationManager;
 
     double latitude, longitude;
+
+    private static final int REQUEST = 112;
+    String [] PERMISSIONS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
 
     class Information extends AsyncTask<String,Void,String> {
@@ -216,7 +224,7 @@ public class InfoActivity extends AppCompatActivity {
                             public void onLocationChanged(@NonNull Location location) {
                                 latitude = location.getLatitude();
                                 longitude = location.getLongitude();
-                                Log.i("TAG", "lat" + latitude);
+                                Log.i("TAG", "lat" + latitude + "long: " + longitude);
 
                             }
                         };
@@ -224,8 +232,12 @@ public class InfoActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             try {
-                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, locationListener);
+                                if (!hasPermissions(InfoActivity.this, PERMISSIONS)) {
+                                    ActivityCompat.requestPermissions((Activity) InfoActivity.this, PERMISSIONS, REQUEST );
+                                } else {
+                                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, locationListener);
 
+                                }
                             }
                             catch(SecurityException e){
                                 e.printStackTrace();
@@ -327,5 +339,15 @@ public class InfoActivity extends AppCompatActivity {
         {
             e.printStackTrace();
         }
+    }
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
