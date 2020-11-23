@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -20,6 +21,7 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -67,10 +69,28 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     AlarmClockAdapter adapter;
     AlarmManager alarmManager;
 
+    private static final int REQUEST = 112;
+    String [] PERMISSIONS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (!hasPermissions(MainActivity.this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions((Activity) MainActivity.this, PERMISSIONS, REQUEST );
+        }
 
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         MediaPlayer alarmMusic = new MediaPlayer();
