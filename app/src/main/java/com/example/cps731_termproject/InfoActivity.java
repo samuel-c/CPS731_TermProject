@@ -251,7 +251,17 @@ public class InfoActivity extends AppCompatActivity {
                         String locationTxt = editText.getText().toString().trim();
 
                         getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + locationTxt + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
-                        getNews(locationTxt.split(",")[1].trim());
+
+                        try{
+                            int findComma = locationTxt.lastIndexOf(",");
+                            String country = findComma != -1 ? locationTxt.substring(findComma + 1).trim() : "";
+                            Log.i ("test", country);
+                            getNews(country);
+                        }
+                        catch(StringIndexOutOfBoundsException e){
+                            e.printStackTrace();
+                        }
+
 
                         boolean[] temp = new boolean[] {false, false, false, false, false, false, false};
 
