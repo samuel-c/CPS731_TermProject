@@ -53,7 +53,7 @@ public class Alarm implements Serializable {
     //@ColumnInfo(name = "music")
     //MediaPlayer alarmMusic;
 
-    public Alarm(String alarmName, int hours, int minutes, int seconds, Ringtone ringtone){
+    public Alarm(String alarmName, int hours, int minutes, int seconds){
         this.alarmName = alarmName;
         this.hourOfDay = hours;
         this.minutes = minutes;
@@ -100,6 +100,12 @@ public class Alarm implements Serializable {
     }
 
 
+    public void setRingtonePlay(boolean bool){
+        if (bool)
+            ringtone.play();
+        else
+            ringtone.stop();
+    }
 
     public void snooze (int minutes){
 
@@ -181,8 +187,37 @@ public class Alarm implements Serializable {
         this.alarmMusic = alarmMusic;
     }
 */
-    public String toString(){
+    public String getFormattedTime(){
         String output = "";
+
+        int hour = this.hourOfDay % 12;
+        if (hour == 0)
+            hour = 12;
+
+        if (hour < 10){
+            output += "0" + hour + ":";
+        }
+        else{
+            output += hour + ":";
+        }
+
+        if (minutes < 10){
+            output += "0" + minutes;
+        }
+        else{
+            output += minutes;
+        }
+
+        if (this.hourOfDay < 12)
+            output += " AM";
+        else
+            output += " PM";
+
+        return output;
+    }
+
+    public String toString(){
+        String output = "ID: " + this.id + ", ";
 
         int hour = this.hourOfDay % 12;
         if (hour == 0)

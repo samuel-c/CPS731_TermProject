@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
             // UI
             recyclerView = findViewById(R.id.recycler_view);
-            //btnAdd = findViewById(R.id.btn_add);
+            btnAdd = findViewById(R.id.btn_add);
             btnReset = findViewById(R.id.btn_reset);
             btnAddAlarm = findViewById(R.id.btn_add_alarm);
             editText = findViewById(R.id.edit_text);
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     Date currentTime = Calendar.getInstance().getTime();
 
-                    Alarm alarm = new Alarm("Alarm #" + (dataList.size() + 1), hourOfDay, minute, 0, ringtone);
+                    Alarm alarm = new Alarm("Alarm #" + (dataList.size() + 1), hourOfDay, minute, 0);
                     database.mainDao().insert(alarm);
 
                     dataList.clear();
@@ -218,7 +218,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Cal: " + currentAlarmTime.getTime().toString());
 
                     Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
-                    intent.putExtra("alarm", alarm);
+                    intent.putExtra("alarmSID", alarm.getId());
+                    intent.putExtra("newContext", true);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     Log.d(TAG, "Alarm Started: Name: " + alarm.getAlarmName() + ", ID: " + alarm.getId());
 
@@ -241,6 +242,44 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             };
+
+            btnAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Calendar currentTime = Calendar.getInstance();
+                    currentTime.add(Calendar.SECOND, 5);
+                    Alarm alarm = new Alarm("Alarm #" + (dataList.size() + 1), currentTime.get(Calendar.HOUR_OF_DAY), currentTime.get(Calendar.MINUTE), currentTime.get(Calendar.SECOND));
+                    database.mainDao().insert(alarm);
+
+                    dataList.clear();
+                    dataList.addAll(database.mainDao().getAll());
+                    adapter.notifyDataSetChanged();
+                    //c.set((Calendar.HOUR_OF_DAY), hourOfDay);
+                    //c.set((Calendar.MINUTE), minute);
+
+                    alarm = database.mainDao().getAlarmByName(alarm.getAlarmName(), alarm.getHours(), alarm.getMinutes());
+
+                    // Initialize current Alarm
+                    Calendar currentAlarmTime = Calendar.getInstance();
+                    currentAlarmTime.set(Calendar.HOUR_OF_DAY, alarm.getHours());
+                    currentAlarmTime.set(Calendar.MINUTE, alarm.getMinutes());
+                    currentAlarmTime.set(Calendar.SECOND, alarm.getSeconds());
+
+                    if (currentAlarmTime.before(Calendar.getInstance()))
+                        currentAlarmTime.add(Calendar.DAY_OF_MONTH, 1); // Go next day
+
+                    Log.d(TAG, "Cal: " + currentAlarmTime.getTime().toString());
+
+                    Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                    intent.putExtra("alarmSID", alarm.getId());
+                    intent.putExtra("newContext", true);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    Log.d(TAG, "Alarm Started: Name: " + alarm.getAlarmName() + ", ID: " + alarm.getId() + ", " + alarm.getFormattedTime());
+
+
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentAlarmTime.getTimeInMillis(), pendingIntent);
+                }
+            });
 
             btnAddAlarm.setOnClickListener(new View.OnClickListener() {
                 @Override

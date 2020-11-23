@@ -66,7 +66,6 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
     private Activity context;
     private RoomDB database;
     private AlarmManager alarmManager;
-    private PendingIntent alarmIntent;
 
     boolean var = false;
 
@@ -75,9 +74,11 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         this.context = context;
         this.dataList = alarmList;
         count = alarmList.size();
+
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        //Intent intent = new Intent(context, AlarmReceiver.class);
+
+        //alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         notifyDataSetChanged();
     }
 
@@ -99,7 +100,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         database = RoomDB.getInstance(context);
         //Set text on text view
         holder.textView.setText(alarm.getAlarmName());
-        holder.textTime.setText(alarm.toString());
+        holder.textTime.setText(alarm.getFormattedTime());
         holder.btnSwitch.setChecked(alarm.getState() == 0 ? true : false);
 
         Calendar c = Calendar.getInstance();
@@ -146,7 +147,8 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
                 Log.d(TAG, "Cal: " + currentAlarmTime.getTime().toString());
 
                 Intent intent = new Intent(context, AlarmReceiver.class);
-                intent.putExtra("alarm", alarm);
+                intent.putExtra("alarmSID", alarm.getId());
+                intent.putExtra("newContext", false);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, sID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 Log.d(TAG, "Alarm Started: " + alarm.getAlarmName() + sID);
 
