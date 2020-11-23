@@ -1,20 +1,21 @@
 package com.example.cps731_termproject;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.Manifest;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -33,23 +34,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TooManyListenersException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -72,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
     RoomDB database;
     AlarmClockAdapter adapter;
     AlarmManager alarmManager;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,11 +119,11 @@ public class MainActivity extends AppCompatActivity {
             });
 
             // UI
-            recyclerView = findViewById(R.id.recycler_view);
+            recyclerView = findViewById(R.id.recycler_viewNews);
             btnAdd = findViewById(R.id.btn_add);
             btnReset = findViewById(R.id.btn_reset);
             btnAddAlarm = findViewById(R.id.btn_add_alarm);
-            editText = findViewById(R.id.edit_text);
+            editText = findViewById(R.id.edit_textLocation);
             fab = findViewById(R.id.fab);
 
 

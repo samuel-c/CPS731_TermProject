@@ -118,6 +118,7 @@ public class AlarmActivity extends AppCompatActivity {
             public void onClick(View v) {
                 RingtonePlayer.ringtone.stop();
                 startActivity(new Intent(AlarmActivity.this, InfoActivity.class));
+                finish();
             }
         });
 

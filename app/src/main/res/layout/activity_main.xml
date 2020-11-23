@@ -37,7 +37,7 @@
             android:text="Placeholder Email" />
     </LinearLayout>
         <EditText
-            android:id="@+id/edit_text"
+            android:id="@+id/edit_textLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:drawable/editbox_background"
@@ -50,7 +50,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_below="@id/edit_text"
+            android:layout_below="@id/edit_textLocation"
             android:layout_alignParentLeft="true"
             android:id="@+id/buttonGroup"
             >
@@ -75,7 +75,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recycler_viewNews"
         android:layout_width="match_parent"
         android:layout_height="744dp"
         android:layout_marginTop="8dp"

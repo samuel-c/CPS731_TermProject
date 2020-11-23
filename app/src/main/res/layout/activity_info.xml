@@ -68,5 +68,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="More information" />
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Settings" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_viewNews"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/buttonGroup"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="8dp"
+        tools:listitem="@layout/recyclerview_newsitem" />
 
 </LinearLayout>

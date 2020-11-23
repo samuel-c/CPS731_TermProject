@@ -1,14 +1,25 @@
 package com.example.cps731_termproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,20 +32,34 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import com.example.cps731_termproject.utils.NewsItem;
 import com.squareup.picasso.Picasso;
 
 public class InfoActivity extends AppCompatActivity {
 
-    class Weather extends AsyncTask<String,Void,String> {
+    List<NewsItem> dataList = new ArrayList<>();
+    RecyclerView recyclerView;
+    NewsAdapter newsAdapter;
+
+    LocationManager locationManager;
+
+    double latitude, longitude;
+
+
+    class Information extends AsyncTask<String,Void,String> {
         @Override
         protected String doInBackground(String... address)
         {
             try{
                 URL url =  new URL(address[0]);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Accept", "application/geo+json;version=1");
+                connection.setRequestProperty("User-Agent", "http://newsapi.org/");
                 connection.connect();
 
                 InputStream is = connection.getInputStream();
@@ -63,12 +88,25 @@ public class InfoActivity extends AppCompatActivity {
             return null;
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
 
-        Weather weather = new Weather();
+
+        // Init GPS Service
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        recyclerView = findViewById(R.id.recycler_viewNews);
+        newsAdapter = new NewsAdapter(InfoActivity.this, dataList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(newsAdapter);
+
+
+
+        Information weather = new Information();
+        Information news = new Information();
         try {
             String content;
             String f = "imperial";
@@ -134,6 +172,8 @@ public class InfoActivity extends AppCompatActivity {
             Log.i("cityName"  ,name);
             Log.i("id"  ,id);
 
+
+            // UI
             ImageView imageView = findViewById(R.id.weatherIcon);
             String imageUrl = "http://openweathermap.org/img/wn/"+icon+"@2x.png";
             Picasso.get().load(imageUrl).into(imageView);
@@ -146,6 +186,70 @@ public class InfoActivity extends AppCompatActivity {
             locationText.setText(name+","+country);
             tempText.setText(temp+"°C");
             descriptionText.setText("Feels like "+feelsLike+"°C. "+description+".");
+
+            Button btnSettings = findViewById(R.id.btnSettings);
+            btnSettings.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //Dialog
+                    Dialog dialog = new Dialog(InfoActivity.this);
+                    //dialog.setContentView(R.layout.content_main);
+                    dialog.setContentView(R.layout.dialog_settings);
+
+                    int width = WindowManager.LayoutParams.MATCH_PARENT;
+                    int height = WindowManager.LayoutParams.WRAP_CONTENT;
+
+                    dialog.getWindow().setLayout(width,height);
+                    dialog.show();
+
+                    //Init and assign variables
+                    EditText editText = dialog.findViewById(R.id.edit_textLocation);
+                    ImageButton btnGPS = dialog.findViewById(R.id.btnGPS);
+                    Button btnUpdate = dialog.findViewById(R.id.btn_updateLocation);
+
+                    btnGPS.setOnClickListener((new View.OnClickListener() {
+
+
+                        LocationListener locationListener = new LocationListener() {
+                            @Override
+                            public void onLocationChanged(@NonNull Location location) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                                Log.i("TAG", "lat" + latitude);
+
+                            }
+                        };
+
+                        @Override
+                        public void onClick(View v) {
+                            try {
+                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, locationListener);
+
+                            }
+                            catch(SecurityException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }));
+
+                    btnUpdate.setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v){
+
+                            dialog.dismiss();
+                            //Get Updated Text
+                            String uAlarmName = editText.getText().toString().trim();
+
+                            boolean[] temp = new boolean[] {false, false, false, false, false, false, false};
+
+
+                            //notifyItemChanged(position);
+                            //holder.btnSwitch.setClickable(true);
+                        }
+                    });
+                }
+            });
 
             Button weatherButton = findViewById(R.id.btnWeatherURL);
             weatherButton.setOnClickListener(new View.OnClickListener() {
@@ -163,6 +267,65 @@ public class InfoActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        //news
+        try {
+            String content2;
+            String c = "CA";
+            content2 = news.execute("http://newsapi.org/v2/top-headlines?country="+c+"&pagesize=5&apiKey=d10ca8f5633d47209bd5a4736d102516").get();
+            Log.i("asd :"  ,content2);
+            JSONObject jsonObject = new JSONObject(content2);
+            String newsData = jsonObject.getString("articles");
 
+            Log.i("newsData :"  ,newsData);
+            JSONArray array = new JSONArray(newsData);
+
+            String author = "";
+            String source = "";
+            String title = "";
+            String description = "";
+            String url = "";
+            String urlToImage = "";
+            String publishedAt = "";
+            String contents = "";
+
+
+            for(int i = 0;i<array.length();i++)
+            {
+                JSONObject inArticle = array.getJSONObject(i);
+                author = inArticle.getString("author");
+                source = inArticle.getJSONObject("source").getString("name");
+                title = inArticle.getString("title");
+                description = inArticle.getString("description");
+                url = inArticle.getString("url");
+                urlToImage = inArticle.getString("urlToImage");
+                publishedAt = inArticle.getString("publishedAt");
+                contents = inArticle.getString("content");
+
+                dataList.add(new NewsItem(title, description, author, source, url, urlToImage));
+
+                Log.i("author"  , author);
+                Log.i("source"  ,source);
+                Log.i("title"  ,title);
+                Log.i("description"  ,description);
+                Log.i("url"  ,url);
+                Log.i("urlToImage"  ,urlToImage);
+                Log.i("publishedAt"  ,publishedAt);
+                Log.i("content"  ,contents);
+
+            }
+
+
+
+            //ImageView imageView = findViewById(R.id.imageNews);
+            //String imageUrl = urlToImage;
+            //Picasso.get().load(imageUrl).into(imageView);
+
+            //TextView temptext = findViewById(R.id.temp);
+            //temptext.setText(temp+" C");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }
