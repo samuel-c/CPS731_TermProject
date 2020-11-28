@@ -104,27 +104,51 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
         TimePickerDialog.OnTimeSetListener d = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                // Init main data
-                //Alarm a = dataList.get(holder.getAdapterPosition());
-                // Get id
-                //int sID = a.getId();
 
-                Date currentTime = Calendar.getInstance().getTime();
+                if (alarm.getState() != 1){
+                    Intent intent = new Intent(context, AlarmReceiver.class);
+                    intent.putExtra("alarmSID", alarm.getId());
+                    intent.putExtra("newContext", false);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, sID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+                    alarmManager.cancel(pendingIntent);
+                }
 
-                dataList.add(alarm);
+                alarm.setHours(hourOfDay);
+                alarm.setMinutes(minute);
 
-                holder.btnSwitch.setClickable(false);
+                // Initialize current Alarm
+                Calendar currentAlarmTime = Calendar.getInstance();
+                currentAlarmTime.set(Calendar.HOUR_OF_DAY, alarm.getHours());
+                currentAlarmTime.set(Calendar.MINUTE, alarm.getMinutes());
+                currentAlarmTime.set(Calendar.SECOND, 0);
+
+                if (currentAlarmTime.before(Calendar.getInstance()))
+                    currentAlarmTime.add(Calendar.DAY_OF_MONTH, 1); // Go next day
+
+                dataList.set(position, alarm);
+
+                //holder.btnSwitch.setClickable(false);
                 database.mainDao().updateTime(sID, hourOfDay, minute);
 
+                Intent intent = new Intent(context, AlarmReceiver.class);
+                intent.putExtra("alarmSID", alarm.getId());
+                intent.putExtra("newContext", true);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, sID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                if (alarm.getState() != 1){
+                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, currentAlarmTime.getTimeInMillis(), pendingIntent);
+                    Log.d(TAG, "Alarm Started: Name: " + alarm.getAlarmName() + ", ID: " + alarm.getId());
+                }
 
                 //dataList.clear();
                 //dataList.addAll(database.mainDao().getAll());
-                notifyItemInserted(position);
-                holder.btnSwitch.setClickable(true);
+                notifyItemChanged(position);
+                //holder.btnSwitch.setClickable(true);
 
             }
         };
+
 
         // Alarm state (switch button)
         holder.btnSwitch.setOnClickListener(new View.OnClickListener() {
@@ -143,7 +167,7 @@ public class AlarmClockAdapter extends RecyclerView.Adapter<AlarmClockAdapter.Vi
 
                 Intent intent = new Intent(context, AlarmReceiver.class);
                 intent.putExtra("alarmSID", alarm.getId());
-                intent.putExtra("newContext", false);
+                intent.putExtra("newContext", true);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, sID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 Log.d(TAG, "Alarm Started: " + alarm.getAlarmName() + sID);
 

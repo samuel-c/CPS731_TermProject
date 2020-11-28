@@ -2,8 +2,11 @@ package com.example.cps731_termproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.OnLifecycleEvent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
@@ -24,6 +27,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +36,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.cps731_termproject.utils.Alarm;
+import com.example.cps731_termproject.utils.NetworkUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -45,16 +51,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends BaseActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+
 
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private FirebaseFirestore db;
 
+
     private final String TAG = "MainActivity";
 
-    TextView mName, mEmail;
-    Button btnSignOut;
+    TextView mName;
+    //TextView mEmail;
+    //Button btnSignOut;
 
     // UI
     EditText editText;
@@ -66,8 +75,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     List<Alarm> dataList = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     RoomDB database;
-    AlarmClockAdapter adapter;
+    public AlarmClockAdapter adapter;
     AlarmManager alarmManager;
+
+    private Toolbar toolbar;
+
 
     private static final int REQUEST = 112;
     String [] PERMISSIONS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
@@ -84,12 +96,24 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     @Override
+    public void onBackPressed(){
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+
+
         if (!hasPermissions(MainActivity.this, PERMISSIONS)) {
             ActivityCompat.requestPermissions((Activity) MainActivity.this, PERMISSIONS, REQUEST );
+        }
+        if (!NetworkUtils.isNetworkConnected(this)){
+            startActivity(new Intent(MainActivity.this, NoInternetActivity.class));
         }
 
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -97,13 +121,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         alarmMusic = alarmMusic.create(getApplicationContext(), R.raw.alarm_sound);
 
         // Authenticate
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = getmAuth();
         user = mAuth.getCurrentUser();
-        db = FirebaseFirestore.getInstance();
+        db = getDb();
 
         if (user != null){
             mName = findViewById(R.id.textViewDisplayName);
-            mEmail = findViewById(R.id.textViewDisplayEmail);
+            //mEmail = findViewById(R.id.textViewDisplayEmail);
 
             Log.d(TAG, Boolean.toString(user == null));
             Log.d(TAG, "test: " + user.getUid());
@@ -117,8 +141,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            mName.setText(document.getString("fName"));
-                            mEmail.setText(document.getString("email"));
+                            mName.setText("Welcome back, " + document.getString("fName") + "!");
+                            //mEmail.setText(document.getString("email"));
                         } else {
                             Log.d(TAG, "No such document");
                         }
@@ -128,18 +152,22 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                     }
                 }
             });
-
+/*
             btnSignOut = findViewById(R.id.buttonSignOut);
             btnSignOut.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mAuth.signOut();
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
                 }
             });
 
+ */
+
             // UI
-            recyclerView = findViewById(R.id.recycler_viewNews);
+            recyclerView = findViewById(R.id.recycler_viewAlarms);
             btnAdd = findViewById(R.id.btn_add);
             btnReset = findViewById(R.id.btn_reset);
             btnAddAlarm = findViewById(R.id.btn_add_alarm);
@@ -309,12 +337,17 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         }
         else{
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
         }
 
     }
 
+    @Override
+    protected int getLayoutResource() {
+        return R.layout.activity_main;
+    }
 
 
 }

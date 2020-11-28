@@ -6,71 +6,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-        <Button
-            android:id="@+id/buttonSignOut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign Out"
-            android:layout_alignParentLeft="true" />
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/toolbar" />
 
     <LinearLayout
-        android:id="@+id/user_info"
+        android:id="@+id/dev_tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_toRightOf="@id/buttonSignOut">
+        android:layout_below="@id/tool_bar">
 
         <TextView
-            android:id="@+id/textViewDisplayName"
-            android:layout_width="wrap_content"
+            android:id="@+id/textDev"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/buttonSignOut"
-            android:text="Placeholder Name" />
-
-        <TextView
-            android:id="@+id/textViewDisplayEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/textViewDisplayName"
-            android:layout_toRightOf="@id/buttonSignOut"
-            android:text="Placeholder Email" />
-    </LinearLayout>
-
+            android:text="Developer Tools Buttons (for testing):" />
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_below="@id/buttonSignOut"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tool_bar"
             android:layout_alignParentLeft="true"
-            android:id="@+id/buttonGroup"
-            >
+            android:id="@+id/buttonGroup">
+
             <Button
                 android:id="@+id/btn_add"
+                style="@style/Widget.AppCompat.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add" />
 
             <Button
                 android:id="@+id/btn_reset"
+                style="@style/Widget.AppCompat.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Reset" />
 
             <Button
                 android:id="@+id/btn_add_alarm"
+                style="@style/Widget.AppCompat.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Get Info" />
         </LinearLayout>
 
 
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewDisplayName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dev_tools"
+        android:text="Welcome back!"
+        android:textColor="#FF5722"
+        android:textSize="18sp" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_viewNews"
+        android:id="@+id/recycler_viewAlarms"
         android:layout_width="match_parent"
         android:layout_height="744dp"
-        android:layout_marginTop="8dp"
         tools:listitem="@layout/recyclerview_item"
-        android:layout_below="@id/buttonGroup"
+        android:layout_below="@id/textViewDisplayName"
         android:layout_alignParentLeft="true"/>
 
     <LinearLayout

@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".InfoActivity">
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/toolbar" />
 
     <TextView
         android:id="@+id/textCurrentTime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="qwe"
+        android:text="Last Updated Time"
         android:textAlignment="center"
         android:textColor="#FF5722"
         android:textSize="18sp" />
@@ -20,7 +23,7 @@
         android:id="@+id/textCityCountry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Toronto, US"
+        android:text="City, Country"
         android:textAlignment="center"
         android:textColor="#2E2A2A"
         android:textSize="30sp" />
@@ -49,7 +52,7 @@
             android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="asd"
+            android:text="0.00°C"
             android:textColor="#2E2A2A"
             android:textSize="48sp" />
     </LinearLayout>
@@ -58,18 +61,21 @@
         android:id="@+id/textDescription"
         android:layout_width="match_parent"
         android:layout_height="31dp"
-        android:text="Feels like -5°C. Light rain. Gentle Breeze"
+        android:text="Feels like 0°C. Description."
         android:textAlignment="center"
         android:textColor="#1B1919"
         android:textSize="18sp" />
 
     <Button
         android:id="@+id/btnWeatherURL"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="More information" />
+
     <Button
         android:id="@+id/btnSettings"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Settings" />

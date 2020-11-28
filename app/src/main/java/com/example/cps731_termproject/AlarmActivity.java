@@ -1,6 +1,7 @@
 package com.example.cps731_termproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,13 +13,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.cps731_termproject.utils.Alarm;
+import com.example.cps731_termproject.utils.NetworkUtils;
 import com.example.cps731_termproject.utils.RingtonePlayer;
 import com.example.cps731_termproject.utils.WakeLocker;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,6 +35,8 @@ public class AlarmActivity extends AppCompatActivity {
 
     private final String TAG = "AlarmActivity";
 
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     // UI
     TextView text_time;
@@ -40,12 +48,25 @@ public class AlarmActivity extends AppCompatActivity {
     // Alarm manager
     private AlarmManager alarmManager;
 
+    AlarmClockAdapter adapter;
 
+    @Override
+    public void onBackPressed(){
+        finish();
+        startActivity(new Intent(this, MainActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+
+        if (!NetworkUtils.isNetworkConnected(this)){
+            startActivity(new Intent(this, NoInternetActivity.class));
+        }
 
         alarmManager = (AlarmManager) AlarmActivity.this.getSystemService(Context.ALARM_SERVICE);
 
@@ -75,7 +96,7 @@ public class AlarmActivity extends AppCompatActivity {
 
                 // Get current Alarm Time
                 Calendar currentTime = Calendar.getInstance();
-                currentTime.add(Calendar.SECOND, 10);
+                currentTime.add(Calendar.SECOND, 5);
 
                 Intent intent = new Intent(AlarmActivity.this, AlarmReceiver.class);
                 intent.putExtra("alarmSID", alarm.getId());
@@ -116,6 +137,20 @@ public class AlarmActivity extends AppCompatActivity {
         btn_alarm_off.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean temp;
+                int tempState = 1; // default alarm off
+                for (int i = 0 ; i < alarm.getDaysOfWeek().length; i ++){
+                    temp = alarm.getDaysOfWeek()[i];
+                    // If repeat change state to standby
+                    if (temp){
+                        tempState = 0; // Standby
+                        break;
+                    }
+                }
+
+                alarm.setState(tempState);
+                database.mainDao().updateState(alarm.getId(), tempState);
+                Log.i(TAG, "" + tempState);
                 RingtonePlayer.ringtone.stop();
                 startActivity(new Intent(AlarmActivity.this, InfoActivity.class));
                 finish();

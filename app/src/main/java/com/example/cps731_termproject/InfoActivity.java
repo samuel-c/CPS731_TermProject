@@ -1,7 +1,7 @@
 package com.example.cps731_termproject;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,7 +12,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
@@ -44,13 +43,31 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import com.example.cps731_termproject.utils.NetworkUtils;
 import com.example.cps731_termproject.utils.NewsItem;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
-public class InfoActivity extends AppCompatActivity {
+public class InfoActivity extends BaseActivity {
+
+    private final String TAG = "InfoActivity";
+
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private FirebaseFirestore db;
 
     List<NewsItem> dataList = new ArrayList<>();
     RecyclerView recyclerView;
@@ -62,6 +79,8 @@ public class InfoActivity extends AppCompatActivity {
 
     private static final int REQUEST = 112;
     String [] PERMISSIONS = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
+
 
     // UI
     ImageView imageView;
@@ -114,12 +133,34 @@ public class InfoActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    public void onBackPressed(){
+        finish();
+        startActivity(new Intent(this, MainActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+
+        // Authenticate
+        mAuth = getmAuth();
+        user = mAuth.getCurrentUser();
+        db = getDb();
+
+        if (user == null){
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+
+        if (!NetworkUtils.isNetworkConnected(this)){
+            startActivity(new Intent(this, NoInternetActivity.class));
+        }
 
         geocoder = new Geocoder(this, Locale.getDefault());
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -149,37 +190,34 @@ public class InfoActivity extends AppCompatActivity {
         String countryName =  "CA";
         String searchLocationQuery = "";
 
-        try {
-            if (!hasPermissions(InfoActivity.this, PERMISSIONS)) {
-                ActivityCompat.requestPermissions((Activity) InfoActivity.this, PERMISSIONS, REQUEST );
-            }
-            else {
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, locationListener);
-                Criteria criteria = new Criteria();
-                String bestProvider = locationManager.getBestProvider(criteria, true);
-                Location location = locationManager.getLastKnownLocation(bestProvider);
-                //Location location2 = new Location()
-                if (location == null) {
-                    Toast.makeText(getApplicationContext(), "GPS signal not found", Toast.LENGTH_SHORT).show();
-                    getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + "toronto,ca" + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
-                    getNews("ca");
-                } else {
-                    getWeather("http://api.openweathermap.org/data/2.5/weather?lat=" + location.getLatitude() + "&lon=" + location.getLongitude() + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
-                    getNews(countryName);
+        DocumentReference documentReference = db.collection("users").document(user.getUid());
+
+        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        String location = document.getString("location");
+
+                        String [] tempValues = getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + location + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
+                        getNews(tempValues[0]);
+                        //mEmail.setText(document.getString("email"));
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
                 }
-
+                else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
             }
+        });
 
-
+        if (!hasPermissions(InfoActivity.this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions((Activity) InfoActivity.this, PERMISSIONS, REQUEST );
         }
-        catch(SecurityException e){
-            e.printStackTrace();
-        }
-
-        // Default values
-        getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + "toronto,ca" + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
-        getNews("CA");
 
         // Init GPS Service
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -219,17 +257,41 @@ public class InfoActivity extends AppCompatActivity {
                             }
                             else {
 
+                                Location location = null;
+
                                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 5, locationListener);
                                 Criteria criteria = new Criteria();
                                 String bestProvider = locationManager.getBestProvider(criteria, true);
-                                Location location = locationManager.getLastKnownLocation(bestProvider);
+                                if(bestProvider != null)
+                                    location = locationManager.getLastKnownLocation(bestProvider);
 
                                 if (location == null) {
                                     Toast.makeText(getApplicationContext(), "GPS signal not found", Toast.LENGTH_SHORT).show();
 
                                 } else {
-                                    String country = getWeather("http://api.openweathermap.org/data/2.5/weather?lat=" + location.getLatitude() + "&lon=" + location.getLongitude() + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
-                                    getNews(country);
+                                    String [] tempValues = getWeather("http://api.openweathermap.org/data/2.5/weather?lat=" + location.getLatitude() + "&lon=" + location.getLongitude() + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
+                                    getNews(tempValues[0]);
+
+                                    if (tempValues != null) {
+
+                                        DocumentReference documentReference = db.collection("users").document(user.getUid());
+                                        Map<String, Object> userData = new HashMap<>();
+                                        userData.put("location", tempValues[1] + "," + tempValues[0]);
+                                        documentReference.update(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "onSuccess: User Profile is created for " + user.getUid());
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.d(TAG, "onFailure: " + e.toString());
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        Toast.makeText(InfoActivity.this, "GPS no signal.", Toast.LENGTH_LONG).show();
+                                    }
                                 }
                                 dialog.dismiss();
                             }
@@ -250,7 +312,7 @@ public class InfoActivity extends AppCompatActivity {
                         //Get Updated Text
                         String locationTxt = editText.getText().toString().trim();
 
-                        getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + locationTxt + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
+                        String [] tempValues = getWeather("http://api.openweathermap.org/data/2.5/weather?q=" + locationTxt + "&units=metric&APPID=b6c15dcbe8b4a2a7df28700233152283");
 
                         try{
                             String country = "";
@@ -263,8 +325,24 @@ public class InfoActivity extends AppCompatActivity {
                                 country = "";
                             }
                             //String country = findComma != -1 ? locationTxt.substring(findComma + 1).trim() : "";
-                            Log.i ("test", country);
-                            getNews(country);
+
+                            boolean dataIsFine = getNews(country);
+                            if (dataIsFine){
+                                DocumentReference documentReference = db.collection("users").document(user.getUid());
+                                Map<String, Object> userData = new HashMap<>();
+                                userData.put("location", tempValues[1] + "," + tempValues[0]);
+                                documentReference.update(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d(TAG, "onSuccess: User Profile is created for " + user.getUid());
+                                    }
+                                }). addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d(TAG, "onFailure: " + e.toString());
+                                    }
+                                });
+                            }
                         }
                         catch(StringIndexOutOfBoundsException e){
                             e.printStackTrace();
@@ -291,6 +369,11 @@ public class InfoActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected int getLayoutResource() {
+        return R.layout.activity_info;
+    }
+
     private static boolean hasPermissions(Context context, String... permissions) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
             for (String permission : permissions) {
@@ -304,17 +387,18 @@ public class InfoActivity extends AppCompatActivity {
 
 
 
-    public void getNews(String country){
+    public boolean getNews(String country){
         Information news = new Information();
 
+        boolean returnValue = false;
 
         //news
         try {
             String content2;
             Log.i("asd :"  ,"dsakd;lasd");
-            content2 = news.execute("http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=5233fac1e7824b48aaa0c6c4da530648").get();
+            content2 = news.execute("http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=d10ca8f5633d47209bd5a4736d102516").get();
             Log.i("asd :"  ,content2);
-            Log.i("test :"  ,"http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=5233fac1e7824b48aaa0c6c4da530648");
+            Log.i("test :"  ,"http://newsapi.org/v2/top-headlines?country="+country+"&pagesize=5&apiKey=d10ca8f5633d47209bd5a4736d102516");
             JSONObject jsonObject = new JSONObject(content2);
             String newsData = jsonObject.getString("articles");
 
@@ -337,6 +421,7 @@ public class InfoActivity extends AppCompatActivity {
                 //Log.i("WWW"  ,totalResults);
 
                 dataList.clear();
+                returnValue = true;
             }
             else{
                 Toast.makeText(InfoActivity.this, "Invalid Input.", Toast.LENGTH_LONG).show();
@@ -382,11 +467,14 @@ public class InfoActivity extends AppCompatActivity {
         {
             e.printStackTrace();
         }
+        return returnValue;
     }
 
-    public String getWeather(String url){
+    public String [] getWeather(String url){
         Information weather = new Information();
 
+        String [] tempValues = null;
+        
         try {
             String content;
             String f = "imperial";
@@ -464,13 +552,15 @@ public class InfoActivity extends AppCompatActivity {
             locationText.setText(name+","+ countryName);
             tempText.setText(temp+"°C");
             descriptionText.setText("Feels like "+feelsLike+"°C. "+description+".");
-
+            
+            tempValues = new String[]{countryName, name};
 
         }
         catch(Exception e)
         {
             e.printStackTrace();
         }
-        return countryName;
+        return tempValues;
     }
+
 }

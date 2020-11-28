@@ -62,10 +62,10 @@ limitations under the License. -->
 
     <TextView
         android:id="@+id/text_time"
-        android:layout_width="166dp"
-        android:layout_height="47dp"
+        android:layout_width="173dp"
+        android:layout_height="28dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="0"
         android:gravity="bottom"
         android:text="00:00 AM"

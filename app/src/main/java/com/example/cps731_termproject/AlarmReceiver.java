@@ -1,5 +1,6 @@
 package com.example.cps731_termproject;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -46,6 +47,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 newIntent.putExtra("alarmSID", alarm.getId());
+                //((Activity)context).finish();
                 context.startActivity(newIntent);
             }
         }

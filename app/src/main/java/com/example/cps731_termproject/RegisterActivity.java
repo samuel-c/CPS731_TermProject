@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.cps731_termproject.utils.NetworkUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,7 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     //String userID;
 
-    EditText mFullName, mEmail, mPassword, mPhoneNumber;
+    EditText mFullName, mEmail, mPassword;
     Button mRegisterBtn;
 
     private final String TAG = "RegisterActivity";
@@ -42,13 +43,16 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        if (!NetworkUtils.isNetworkConnected(this)){
+            startActivity(new Intent(this, NoInternetActivity.class));
+        }
+
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
 
         mFullName = findViewById(R.id.editTextRegisterName);
         mEmail = findViewById(R.id.editTextRegisterEmail);
-        mPhoneNumber = findViewById(R.id.editTextRegisterPhoneNumber);
         mPassword = findViewById(R.id.editTextRegisterPassword);
 
         mRegisterBtn = findViewById(R.id.buttonRegister2);
@@ -63,7 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
                     String email = mEmail.getText().toString().trim();
                     String password = mPassword.getText().toString().trim();
                     String fName = mFullName.getText().toString().trim();
-                    String phoneNum = mPhoneNumber.getText().toString().trim();
 
                     if (TextUtils.isEmpty(email)){
                         mEmail.setError("Email is required.");
@@ -86,7 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
                             Map<String, Object> userData = new HashMap<>();
                             userData.put("fName", fName);
                             userData.put("email", email);
-                            userData.put("pNum", phoneNum);
+                            userData.put("location", "toronto,ca"); // default location
                             documentReference.set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
@@ -100,14 +103,14 @@ public class RegisterActivity extends AppCompatActivity {
                             });
 
                             Log.d(TAG, "createUserWithEmail:success");
-                            Toast.makeText(RegisterActivity.this, "com.example.cps731_termproject.utils.User Created.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, "User Created. Welcome!", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(RegisterActivity.this, MainActivity.class));
 
                         }
                         else{
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                            Toast.makeText(RegisterActivity.this, "Failed to create account (already exists/wrong input).",
                                     Toast.LENGTH_SHORT).show();
                             updateUI(null);
                         }
