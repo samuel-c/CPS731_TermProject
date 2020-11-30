@@ -490,7 +490,7 @@ public class InfoActivity extends BaseActivity {
             String wind = jsonObject.getString("wind");
             String sys = jsonObject.getString("sys");
             String name = jsonObject.getString("name");
-            String id = jsonObject.getString("id");
+            id = jsonObject.getString("id");
 
             Log.i("weatherData :"  ,weatherData);
             JSONArray array = new JSONArray(weatherData);
@@ -549,7 +549,7 @@ public class InfoActivity extends BaseActivity {
             Picasso.get().load(imageUrl).into(imageView);
 
             currentTime.setText("Last updated: "+cal.toString());
-            locationText.setText(name+","+ countryName);
+            locationText.setText(name+", "+ countryName);
             tempText.setText(temp+"°C");
             descriptionText.setText("Feels like "+feelsLike+"°C. "+description+".");
             
